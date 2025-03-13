@@ -1,0 +1,3 @@
+[submodule "Explicit-FRI"]
+	path = Explicit-FRI
+	url = https://github.com/explicit-robotics/Explicit-FRI.git
