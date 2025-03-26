@@ -1,0 +1,211 @@
+<mujoco model="table_with_peg">
+
+  <option timestep='0.0001' iterations='50' integrator='Euler' collision='all' gravity="0 0 -9.81"/>
+
+  <default>
+    <geom solimp=".9 .9 .01"/>
+    <default class="object1">
+      <geom type="capsule" size="0.1 0.05"/>
+    </default>
+  </default> 
+
+  <asset>
+
+        <texture builtin="checker" height="100" width="100" name="texplane" rgb1="1.0 1.0 1.0" rgb2="0.5 0.5 0.5" type="2d" />
+        <material name="MatPlane" reflectance="0.5" shininess="1" specular="1" texrepeat="60 60" texture="texplane"/>
+
+        <!-- ceramic table texture and material-->
+        <!-- <texture file="../textures/ceramic.png" type="cube" name="tex-ceramic"/> -->
+        <material name="table_ceramic" reflectance="0.0" shininess="0.0" specular="0.2" />
+
+        <texture type="skybox" builtin="flat" rgb1="1 1 1" rgb2="1 1 1" width="100" height="100" />
+        <mesh name="iiwa7_link_0" file="meshes/link_0.stl" />
+        <mesh name="iiwa7_link_1" file="meshes/link_1.stl" />
+        <mesh name="iiwa7_link_2" file="meshes/link_2.stl" />
+        <mesh name="iiwa7_link_3" file="meshes/link_3.stl" />
+        <mesh name="iiwa7_link_4" file="meshes/link_4.stl" />
+        <mesh name="iiwa7_link_5" file="meshes/link_5.stl" />
+        <mesh name="iiwa7_link_6" file="meshes/link_6.stl" />
+        <mesh name="iiwa7_link_7" file="meshes/link_7.stl" />
+        <mesh name="iiwa7_link_0_vis" file="meshes/link_0_vis.stl" />
+        <mesh name="iiwa7_link_1_vis" file="meshes/link_1_vis.stl" />
+        <mesh name="iiwa7_link_2_vis" file="meshes/link_2_vis.stl" />
+        <mesh name="iiwa7_link_3_vis" file="meshes/link_3_vis.stl" />
+        <mesh name="iiwa7_link_4_vis" file="meshes/link_4_vis.stl" />
+        <mesh name="iiwa7_link_5_vis" file="meshes/link_5_vis.stl" />
+        <mesh name="iiwa7_link_6_vis" file="meshes/link_6_vis.stl" />
+        <mesh name="iiwa7_link_7_vis" file="meshes/link_7_vis.stl" />
+        <mesh file="meshes/pedestal.stl" name="pedestal"/>
+
+        <mesh name="robotiq_arg2f_base_link" file="meshes/robotiq_arg2f_base_link.stl" />
+        <mesh name="robotiq_arg2f_140_outer_knuckle" file="meshes/robotiq_arg2f_140_outer_knuckle.stl" />
+        <mesh name="robotiq_arg2f_140_outer_finger" file="meshes/robotiq_arg2f_140_outer_finger.stl" />
+        <mesh name="robotiq_arg2f_140_inner_finger" file="meshes/robotiq_arg2f_140_inner_finger.stl" />
+        <mesh name="robotiq_arg2f_140_inner_knuckle" file="meshes/robotiq_arg2f_140_inner_knuckle.stl" />
+        <mesh name="robotiq_arg2f_base_link_vis" file="meshes/robotiq_arg2f_base_link_vis.stl" />
+        <mesh name="robotiq_arg2f_140_outer_knuckle_vis" file="meshes/robotiq_arg2f_140_outer_knuckle_vis.stl" />
+        <mesh name="robotiq_arg2f_140_outer_finger_vis" file="meshes/robotiq_arg2f_140_outer_finger_vis.stl" />
+        <mesh name="robotiq_arg2f_140_inner_finger_vis" file="meshes/robotiq_arg2f_140_inner_finger_vis.stl" />
+        <mesh name="robotiq_arg2f_140_inner_knuckle_vis" file="meshes/robotiq_arg2f_140_inner_knuckle_vis.stl" />
+
+  </asset>
+
+  <worldbody>
+
+    <!-- Floor -->
+    <geom conaffinity="1" condim="3" material="MatPlane" name="floor" pos="0 0 0" rgba="1.0 1.0 1.0 1" size="40 40 40" type="plane"/>
+
+    <!-- Table body -->
+    <body name="table" pos="0 0 0.03">
+      <geom pos="0 0 0" size="0.5 0.8 0.03" type="box" group="0" name="table_collision" friction="1 0.005 0.0001"/>
+      <geom pos="0 0 0" size="0.5 0.8 0.03" type="box" conaffinity="0" contype="0" group="1" name="table_visual" material="table_ceramic"/>
+    </body>
+
+    <!-- Cube -->
+    <body name="cube" pos="0.0 0.4 0.3">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="0.8" diaginertia="1 1 1" />
+      <geom pos="0 0 0" size="0.05 0.05 0.03" type="box" group="0" name="cube_collision" friction="1 0.005 0.0001"/>
+      <geom pos="0 0 0" size="0.05 0.05 0.03" type="box" conaffinity="0" contype="0" group="1" name="cube_visual" rgba = "1 0 0 1"/>
+    </body>
+    
+      <body name="object" pos="0.0 -0.4 0.3">
+      <freejoint/>
+        <inertial pos="0 0 0" mass="500.4525" diaginertia="1 1 1" />
+        <geom pos="0 0 0" size="0.06 0.17 0.03" type="box" group="0" />
+        <geom pos="0.22 0 0" size="0.06 0.17 0.03" type="box" group="0" />
+        <geom pos="0.11 0.11 0" size="0.05 0.06 0.03" type="box" group="0" />
+        <geom pos="0.11 -0.11 0" size="0.05 0.06 0.03" type="box" group="0" />
+      </body>
+
+    <!-- LBR iiwa7 -->
+        <body name="iiwa7_link_0" pos="-0.80 0 0">
+            <!-- robot view -->
+            <body name="base" pos="0 0 0">
+                <camera mode="fixed" name="iiwa7_robotview" pos="1.0 0 0.4" quat="0.653 0.271 0.271 0.653"/>
+                <inertial diaginertia="0 0 0" mass="0" pos="0 0 0"/>
+                <!-- mount attached here -->
+                <!-- Uncomment this if you want to take out the mount -->
+                <!-- <body name="pedestal" pos="0 0 0"> -->
+                    <!-- <inertial diaginertia="6.0869 5.81635 4.20915" mass="60.864" pos="0 0 0" quat="0.659267 -0.259505 -0.260945 0.655692"/> -->
+                    <!-- <geom conaffinity="0" contype="0" group="1" mesh="pedestal" pos="0.26 0.345 -0.91488" quat="0.5 0.5 -0.5 -0.5" rgba="0.2 0.2 0.2 1" type="mesh" name="pedestal_col1"/> -->
+                    <!-- <geom pos="-0.02 0 -0.29" rgba="0.2 0.2 0.2 1" size="0.18 0.31" type="cylinder" name="pedestal_col2"/> -->
+                <!-- </body> -->
+            </body>
+            <geom type="mesh" pos="0 0 0" contype="0" conaffinity="0" group="1" rgba="0.4 0.4 0.4 1" name="iiwa7_link_0_visual" mesh="iiwa7_link_0_vis" />
+            <geom type="mesh" pos="0 0 0" rgba="0.4 0.4 0.4 1" contype="0" mesh="iiwa7_link_0" name="iiwa7_link_0_collision" />
+            <body name="iiwa7_link_1" pos="0 0 0.15">
+                <inertial pos="0 -0.03 0.12" quat="0.428904 0.562175 -0.562175 0.428904" mass="3.4525" diaginertia="0.0218946 0.02183 0.00663837" />
+                <joint name="iiwa7_joint_1" pos="0 0 0" axis="0 0 1" limited="true" range="-2.96706 2.96706" damping="0.1" />
+                <geom pos="0 0 0.0075" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.4 0.4 0.4 1" name="iiwa7_link_1_visual" mesh="iiwa7_link_1_vis" />
+                <geom pos="0 0 0.0075" type="mesh" contype="0" rgba="0.4 0.4 0.4 1" mesh="iiwa7_link_1" name="iiwa7_link_1_collision" />
+                <body name="iiwa7_link_2" pos="0 0 0.19" quat="0 0 0.707107 0.707107">
+                    <inertial pos="0.0003 0.059 0.042" quat="0.701371 0.0898824 0.0898824 0.701371" mass="3.4821" diaginertia="0.02179 0.0217049 0.00684512" />
+                    <joint name="iiwa7_joint_2" pos="0 0 0" axis="0 0 1" limited="true" range="-2.0944 2.0944" damping="0.1" />
+                    <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 0.423529 0.0392157 1" name="iiwa7_link_2_visual" mesh="iiwa7_link_2_vis" />
+                    <geom type="mesh" contype="0" rgba="1 0.423529 0.0392157 1" mesh="iiwa7_link_2" name="iiwa7_link_2_collision" />
+                    <body name="iiwa7_link_3" pos="0 0.21 0" quat="0 0 0.707107 0.707107">
+                        <inertial pos="0 0.03 0.13" quat="0.56292 0.427927 -0.427927 0.56292" mass="4.05623" diaginertia="0.0321488 0.03204 0.00799117" />
+                        <joint name="iiwa7_joint_3" pos="0 0 0" axis="0 0 1" limited="true" range="-2.96706 2.96706" damping="0.1" />
+                        <geom pos="0 0 -0.026" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.4 0.4 0.4 1" name="iiwa7_link_3_visual" mesh="iiwa7_link_3_vis" />
+                        <geom pos="0 0 -0.026" type="mesh" contype="0" rgba="0.4 0.4 0.4 1" mesh="iiwa7_link_3" name="iiwa7_link_3_collision" />
+                        <body name="iiwa7_link_4" pos="0 0 0.19" quat="0.707107 0.707107 0 0">
+                            <inertial pos="0 0.067 0.034" quat="0.991887 -0.127124 0 0" mass="3.4822" diaginertia="0.02178 0.0216947 0.00684029" />
+                            <joint name="iiwa7_joint_4" pos="0 0 0" axis="0 0 1" limited="true" range="-2.0944 2.0944" damping="0.1" />
+                            <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 0.423529 0.0392157 1" name="iiwa7_link_4_visual" mesh="iiwa7_link_4_vis" />
+                            <geom type="mesh" contype="0" rgba="1 0.423529 0.0392157 1" mesh="iiwa7_link_4" name="iiwa7_link_4_collision" />
+                            <body name="iiwa7_link_5" pos="0 0.21 0" quat="0 0 0.707107 0.707107">
+                                <inertial pos="0.0001 0.021 0.076" quat="0.365352 0.605407 -0.605407 0.365352" mass="2.1633" diaginertia="0.0131987 0.01287 0.0036293" />
+                                <joint name="iiwa7_joint_5" pos="0 0 0" axis="0 0 1" limited="true" range="-2.96706 2.96706" damping="0.1" />
+                                <geom pos="0 0 -0.026" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.4 0.4 0.4 1" name="iiwa7_link_5_visual" mesh="iiwa7_link_5_vis" />
+                                <geom pos="0 0 -0.026" type="mesh" contype="0" rgba="0.4 0.4 0.4 1" mesh="iiwa7_link_5" name="iiwa7_link_5_collision" />
+                                <body name="iiwa7_link_6" pos="0 0.0607 0.19" quat="0.707107 0.707107 0 0">
+                                    <inertial pos="0 0.0006 0.0004" quat="0.996112 0.088097 0 0" mass="2.3466" diaginertia="0.006509 0.00631585 0.00447015" />
+                                    <joint name="iiwa7_joint_6" pos="0 0 0" axis="0 0 1" limited="true" range="-2.0944 2.0944" damping="0.1" />
+                                    <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="iiwa7_link_6_vis" name="iiwa7_link_6_visual" rgba="1 0.423529 0.0392157 1" />
+                                    <geom type="mesh" contype="0" rgba="1 0.423529 0.0392157 1" mesh="iiwa7_link_6" name="iiwa7_link_6_collision" />
+                                    <body name="iiwa7_link_7" pos="0 0.081 0.0607" quat="0 0 0.707107 0.707107">
+                                        <inertial pos="0 0 0.02" quat="0.923068 0 0 0.384636" mass="3.129" diaginertia="0.0152362 0.0140538 0.002872" />
+                                        <joint name="iiwa7_joint_7" pos="0 0 0" axis="0 0 1" limited="true" range="-3.05433 3.05433" damping="0.1" />
+                                        <geom pos="0 0 -0.0005" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.4 0.4 0.4 1" mesh="iiwa7_link_7_vis" name="iiwa7_link_7_visual" />
+                                        <geom pos="0 0 -0.0005" type="mesh" contype="0" rgba="0.4 0.4 0.4 1" mesh="iiwa7_link_7" name="iiwa7_link_7_collision" />
+                                        <body name="iiwa7_right_hand" pos="0 0 0.044" quat="0 0 0 1">
+                                            <!-- This camera points out from the eef. -->
+                                            <camera mode="fixed" name="iiwa7_eye_in_hand" pos="0.05 0 0" quat="0 0.707108 0.707108 0" fovy="75"/>
+                                            <!-- To add gripper -->
+
+                                            <body name="right_gripper" pos="0 0 -0.0625" quat="0 -0.707105 0.707108 0 ">
+                                                <geom pos="0 0 -0.061525" quat="0 0.707388 -0.706825 0" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.1 0.1 0.1 1" name="hand_visual" mesh="robotiq_arg2f_base_link_vis" />
+                                                <geom pos="0 0 -0.061525" quat="0 0.707388 -0.706825 0" type="mesh" group="0" rgba="0.1 0.1 0.1 1" mesh="robotiq_arg2f_base_link" name="hand_collision"/>
+
+                                                <site name="ft_frame" pos="0 0 0" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" group="1" />
+
+                                                <!-- This site was added for visualization. -->
+                                                <body name="eef" pos="0 0 -0.27" quat="0 1 0 0">
+                                                    <site name="grip_site" pos="0 0 0" size="0.01 0.01 0.01" rgba="1 0 0 0.5" type="sphere" group="1"/>
+                                                    <site name="ee_x" pos="0.1 0 0" size="0.005 .1"  quat="0.707105  0 0.707108 0 " rgba="1 0 0 0" type="cylinder" group="1"/>
+                                                    <site name="ee_y" pos="0 0.1 0" size="0.005 .1" quat="0.707105 0.707108 0 0" rgba="0 1 0 0" type="cylinder" group="1"/>
+                                                    <site name="ee_z" pos="0 0 0.1" size="0.005 .1" quat="1 0 0 0" rgba="0 0 1 0" type="cylinder" group="1"/>
+                                                    <!-- This site was added for visualization. -->
+                                                    <site name="grip_site_cylinder" pos="0 0 0" size="0.005 10" rgba="0 1 0 0.3" type="cylinder" group="1"/>
+                                                </body>
+
+                                                <body name="left_outer_knuckle" pos="0.030601 2.43684e-05 -0.11643" quat="-0.64507 0.290316 -0.290085 0.644556">
+                                                    <inertial pos="0.000163875 0.0458404 0.0117804" quat="0.881368 0.472423 -0.0024451 -0.000996122" mass="0.0311462" diaginertia="2.96023e-05 2.79814e-05 4.39017e-06" />
+                                                    <joint name="finger_joint" pos="0 0 0" axis="-1 0 0" limited="true" range="0 0.7" />
+                                                    <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.792157 0.819608 0.933333 1" name="left_outer_knuckle_visual" mesh="robotiq_arg2f_140_outer_knuckle_vis" />
+                                                    <geom type="mesh" group="0" rgba="0.792157 0.819608 0.933333 1" mesh="robotiq_arg2f_140_outer_knuckle" name="left_outer_knuckle_collision"/>
+                                                    <geom pos="0 0.01822 0.0260018" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.1 0.1 0.1 1" name="left_outer_finger_visual" mesh="robotiq_arg2f_140_outer_finger_vis" />
+                                                    <geom pos="0 0.01822 0.0260018" type="mesh" group="0" rgba="0.1 0.1 0.1 1" mesh="robotiq_arg2f_140_outer_finger" name="left_outer_finger_collision"/>
+                                                    <body name="left_inner_finger" pos="0 0.0999754 -0.00221853" quat="0.935013 -0.354613 0 0">
+                                                        <inertial pos="0.000119314 0.0339244 -0.021841" quat="0.545437 0.430197 -0.442938 0.566776" mass="0.0261503" diaginertia="1.62408e-05 1.59131e-05 2.38936e-06" />
+                                                        <joint name="left_inner_finger_joint" pos="0 0 0" axis="1 0 0" limited="true" range="-0.8757 0.8757" />
+                                                        <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.1 0.1 0.1 1" name="left_inner_finger_visual" mesh="robotiq_arg2f_140_inner_finger_vis" />
+                                                        <geom type="mesh" group="0" rgba="0.1 0.1 0.1 1" mesh="robotiq_arg2f_140_inner_finger" name="left_inner_finger_collision"/>
+                                                        <geom size="0.0135 0.0325 0.00375" pos="0 0.0457554 -0.0272203" type="box" contype="0" conaffinity="0" group="1" rgba="0.9 0.9 0.9 1" name="left_fingertip_visual" />
+                                                        <geom size="0.015 0.035 0.00375" pos="0 0.0457554 -0.0272203" type="box" group="0" rgba="0.9 0.9 0.9 1" name="left_fingertip_collision" solref="0.01 0.25"/>
+                                                        <geom size="0.014 0.033 0.001" pos="0 0.045 -0.031" type="box" group="0" name="left_fingerpad_collision" />
+                                                    </body>
+                                                </body>
+                                                <body name="left_inner_knuckle" pos="0.0127 1.01133e-05 -0.122945" quat="-0.64507 0.290316 -0.290085 0.644556">
+                                                    <inertial pos="0.000123012 0.0507851 0.00103969" quat="0.497203 0.502496 -0.507943 0.492221" mass="0.0271177" diaginertia="2.83809e-05 2.61936e-05 2.81319e-06" />
+                                                    <joint name="left_inner_knuckle_joint" pos="0 0 0" axis="1 0 0" limited="true" range="-0.8757 0.8757" />
+                                                    <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.1 0.1 0.1 1" name="left_inner_knuckle_visual" mesh="robotiq_arg2f_140_inner_knuckle_vis" />
+                                                    <geom type="mesh" group="0" rgba="0.1 0.1 0.1 1" mesh="robotiq_arg2f_140_inner_knuckle" name="left_inner_knuckle_collision"/>
+                                                </body>
+                                                <body name="right_outer_knuckle" pos="-0.030601 -2.43684e-05 -0.11643" quat="0.644556 -0.290085 -0.290316 0.64507">
+                                                    <inertial pos="0.000163875 0.0458404 0.0117804" quat="0.881368 0.472423 -0.0024451 -0.000996122" mass="0.0311462" diaginertia="2.96023e-05 2.79814e-05 4.39017e-06" />
+                                                    <joint name="right_outer_knuckle_joint" pos="0 0 0" axis="1 0 0" limited="true" range="-0.725 0.725" />
+                                                    <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.792157 0.819608 0.933333 1" name="right_outer_knuckle_visual" mesh="robotiq_arg2f_140_outer_knuckle_vis" />
+                                                    <geom type="mesh" group="0" rgba="0.792157 0.819608 0.933333 1" mesh="robotiq_arg2f_140_outer_knuckle" name="right_outer_knuckle_collision"/>
+                                                    <geom pos="0 0.01822 0.0260018" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.1 0.1 0.1 1" name="right_outer_finger_visual" mesh="robotiq_arg2f_140_outer_finger_vis" />
+                                                    <geom pos="0 0.01822 0.0260018" type="mesh" group="0" rgba="0.1 0.1 0.1 1" mesh="robotiq_arg2f_140_outer_finger" name="right_outer_finger_collision"/>
+                                                    <body name="right_inner_finger" pos="0 0.0999754 -0.00221853" quat="0.935013 -0.354613 0 0">
+                                                        <inertial pos="0.000119314 0.0339244 -0.021841" quat="0.545437 0.430197 -0.442938 0.566776" mass="0.0261503" diaginertia="1.62408e-05 1.59131e-05 2.38936e-06" />
+                                                        <joint name="right_inner_finger_joint" pos="0 0 0" axis="1 0 0" limited="true" range="-0.8757 0.8757" />
+                                                        <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.1 0.1 0.1 1" name="right_inner_finger_visual" mesh="robotiq_arg2f_140_inner_finger_vis" />
+                                                        <geom type="mesh" group="0" rgba="0.1 0.1 0.1 1" mesh="robotiq_arg2f_140_inner_finger" name="right_inner_finger_collision"/>
+                                                        <geom size="0.0135 0.0325 0.00375" pos="0 0.0457554 -0.0272203" type="box" contype="0" conaffinity="0" group="1" rgba="0.9 0.9 0.9 1" name="right_fingertip_visual" />
+                                                        <geom size="0.015 0.035 0.00375" pos="0 0.0457554 -0.0272203" type="box" group="0" rgba="0.9 0.9 0.9 1" name="right_fingertip_collision" solref="0.01 0.25"/>
+                                                        <geom size="0.014 0.033 0.001" pos="0 0.045 -0.031" type="box" group="0" name="right_fingerpad_collision" />
+                                                    </body>
+                                                </body>
+                                                <body name="right_inner_knuckle" pos="-0.0127 -1.01133e-05 -0.122945" quat="-0.644556 0.290085 0.290316 -0.64507">
+                                                    <inertial pos="0.000123012 0.0507851 0.00103969" quat="0.497203 0.502496 -0.507943 0.492221" mass="0.0271177" diaginertia="2.83809e-05 2.61936e-05 2.81319e-06" />
+                                                    <joint name="right_inner_knuckle_joint" pos="0 0 0" axis="1 0 0" limited="true" range="-0.8757 0.8757" />
+                                                    <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.1 0.1 0.1 1" name="right_inner_knuckle_visual" mesh="robotiq_arg2f_140_inner_knuckle_vis" />
+                                                    <geom type="mesh" group="0" rgba="0.1 0.1 0.1 1" mesh="robotiq_arg2f_140_inner_knuckle" name="right_inner_knuckle_collision"/>
+                                                </body>
+                                            </body>
+
+                                        </body>
+                                    </body>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+  </worldbody>
+</mujoco>

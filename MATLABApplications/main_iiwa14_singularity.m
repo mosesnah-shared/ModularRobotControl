@@ -2,9 +2,11 @@
 clear; close all; clc;
 
 % Make sure that you add Explicit-MATLAB before running this script!
+% Under "Explicit-MATLAB" directory, run setup.m file
 
 % Configure default figure properties
 fig_config( 'fontSize', 20, 'markerSize', 10 )
+
 %% (1A) Calculation of the Singular Points
 robot = iiwa14( 'high' );
 robot.init( );

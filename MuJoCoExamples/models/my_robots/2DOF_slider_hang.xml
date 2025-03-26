@@ -1,0 +1,54 @@
+<!-- =========================================================================== #
+# Project:        [M3X] Whip Project
+# Title:          XML Model File for 3D Upper Limb
+# Author:         Moses C. Nah
+# Creation Date:  Monday, July 1st, 2020
+
+# Description: 	  This model file is simply for analyzing the forward kinematics of the upper-limb model.
+#									This 3D_UpperLimb model has 3DOF on the shoulder joint and 1DOF on the elbow joint.
+# =========================================================================== -->
+
+
+<mujoco model="2DOF_slider_hang">
+
+  <compiler angle = "radian" />
+  <option  timestep  = '0.0001' iterations = '50' integrator = 'Euler' gravity = "0 0 -9.81" collision = 'all' />
+  <asset>
+     <texture type = "skybox" builtin = "flat" rgb1 = "1 1 1" width	= "200" height = "200"/>
+  </asset>
+
+  <worldbody>
+
+		<body name='init0' pos='0 0 0' euler='0 0 0'>
+			  <joint name='joint1' ref='0' type='slide' stiffness='0' pos='0 0 0' axis='1 0 0' />
+				<joint name='joint2' ref='0' type='slide' stiffness='0' pos='0 0 0' axis='0 1 0' />
+				<geom name='geom1' type='sphere' pos='0 0 0' size='0.1' mass='1'/>
+        <site name='site1' pos='0 0 0' />
+				 <!-- Comment out the following session to make it 1 DOF -->
+				<body name='hanger' pos='0 0 0' euler='0 0 0'>
+					<site name='forForceSensorSite' pos='0 0 0' />
+					<joint name='joint3' ref='0' type='hinge' damping='0.0' stiffness='0' pos='0 0 0' axis='0 0 1' />
+					<joint name='joint4' ref='0' type='hinge' damping='0.0' stiffness='0' pos='0 0 0' axis='0 1 0' />
+          <site name='site2' pos='0 0 -2' />          
+					<geom type='cylinder' fromto='0 0 0 0 0 -2'   size='0.04' mass='0'/>
+					<geom name='geom2' type='sphere' pos='0 0 -2' size='0.1' mass='1'/>
+				</body>
+		</body>
+
+
+
+
+  </worldbody>
+
+		<sensor>
+				<force name = 'wristForceSensorSite' site = 'forForceSensorSite' />
+		</sensor>
+
+	<actuator>
+
+		<motor joint = 'joint1' name = 'sliderjoint1' forcelimited = 'false' />
+		<motor joint = 'joint2' name = 'sliderjoint2' forcelimited = 'false' />
+
+  </actuator>
+
+</mujoco>
