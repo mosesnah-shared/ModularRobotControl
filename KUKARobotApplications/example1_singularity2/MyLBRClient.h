@@ -104,6 +104,7 @@ private:
     // Double values to get measured robot values and command robot values
     double tau_command[7];
     double q_init[7];
+    double q_init2[7];
     double q_command[7];
     double q_curr[7];
     double q_old[7];
@@ -117,6 +118,7 @@ private:
 
     // The number of time steps for the simulation
     int n_step;
+    int type;
 
     // Choose the body you want to control and the position on this body
     Eigen::Vector3d  p_curr;
@@ -165,6 +167,8 @@ private:
     // Current position and velocity as Eigen vector
     Eigen::VectorXd q;
     Eigen::VectorXd q0_init;
+    Eigen::VectorXd q0_curr;
+    Eigen::VectorXd q0_init2;
     Eigen::VectorXd dq;
 
     // Command torque vectors (with and without constraints)

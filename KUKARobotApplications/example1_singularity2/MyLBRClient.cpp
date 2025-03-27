@@ -54,11 +54,11 @@ or otherwise, without the prior written consent of KUKA Roboter GmbH.
 using namespace std;
 
 #ifndef M_PI
-#define M_PI 3.14159265358979
+    #define M_PI 3.14159265358979
 #endif
 
 #ifndef NCoef
-#define NCoef 1
+    #define NCoef 1
 #endif
 
 static double filterOutput[ 7 ][ NCoef+1 ]; // output samples. Static variables are initialised to 0 by default.
@@ -80,8 +80,16 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     q_init[5] = -37.73 * M_PI/180;
     q_init[6] =  0.000 * M_PI/180;
 
+    q_init2[0] =   3.59 * M_PI/180;
+    q_init2[1] =  96.19 * M_PI/180;
+    q_init2[2] = -15.99 * M_PI/180;
+    q_init2[3] =  65.70 * M_PI/180;
+    q_init2[4] =  11.62 * M_PI/180;
+    q_init2[5] =  30.18 * M_PI/180;
+    q_init2[6] =  13.68 * M_PI/180;
+
     // Use Explicit-cpp to create your robot
-    myLBR = new iiwa14( 1, "Trey" );
+    myLBR = new iiwa14( 1, "Dwight" );
 
     // Initialization must be called!!
     myLBR->init( );
@@ -90,7 +98,9 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     // These two variables are used as "Eigen" objects rather than a double array
     q  = Eigen::VectorXd::Zero( myLBR->nq );
     dq = Eigen::VectorXd::Zero( myLBR->nq );
-    q0_init = Eigen::VectorXd::Zero( myLBR->nq );
+    q0_init  = Eigen::VectorXd::Zero( myLBR->nq );
+    q0_curr  = Eigen::VectorXd::Zero( myLBR->nq );
+    q0_init2 = Eigen::VectorXd::Zero( myLBR->nq );
 
     // Time variables for control loop
     t      = 0;     // The current Time
@@ -102,11 +112,13 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     {
         q( i ) = q_init[ i ];
         q0_init( i ) = q_init[ i ];
-        q_curr[ i ] = q_init[ i ];
-        q_old[ i ] = q_init[ i ];
+        q0_init2( i ) = q_init2[ i ];
 
-        // The Actual command of the joint-position and torque
-        q_command[ i ] = 0.0;
+        q_curr[ i ] = q_init[ i ];
+         q_old[ i ] = q_init[ i ];
+
+         // The Actual command of the joint-position and torque
+          q_command[ i ] = 0.0;
         tau_command[ i ] = 0.0;
     }
 
@@ -121,7 +133,7 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     dp_curr = Eigen::VectorXd::Zero( 3 );
 
     // Create the Minimum-jerk trajectory
-    D   = 3.5;
+    D   = 3.0;
     ti   = 1.0;
     toff = 0.0;
 
@@ -131,16 +143,12 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     dely = Eigen::Vector3d( 0.0, 0.4, 0.0 );
     delz = Eigen::Vector3d( 0.0, 0.0, 0.4 );
 
-    mjt1  = new MinimumJerkTrajectory( 3,                              p0i,    p0i + delx, D,                    ti );    // Forward
-    mjt2  = new MinimumJerkTrajectory( 3, Eigen::Vector3d( 0.0, 0.0, 0.0 ),        - dely, D, ti + 1 * ( D + toff ) );    // Moving Right
-    mjt3  = new MinimumJerkTrajectory( 3, Eigen::Vector3d( 0.0, 0.0, 0.0 ),          delz, D, ti + 2 * ( D + toff ) );    // Moving Up
-    mjt4  = new MinimumJerkTrajectory( 3, Eigen::Vector3d( 0.0, 0.0, 0.0 ),      2 * dely, D, ti + 3 * ( D + toff ) );    // Moving Left
-    mjt5  = new MinimumJerkTrajectory( 3, Eigen::Vector3d( 0.0, 0.0, 0.0 ),     -2 * delz, D, ti + 4 * ( D + toff ) );    // Moving Down
-    mjt6  = new MinimumJerkTrajectory( 3, Eigen::Vector3d( 0.0, 0.0, 0.0 ),     -1 * dely, D, ti + 5 * ( D + toff ) );    // Moving Right
-    mjt7  = new MinimumJerkTrajectory( 3, Eigen::Vector3d( 0.0, 0.0, 0.0 ),      1 * delz, D, ti + 6 * ( D + toff ) );    // Moving Up
-    mjt8  = new MinimumJerkTrajectory( 3, Eigen::Vector3d( 0.0, 0.0, 0.0 ),     -1 * delx, D, ti + 7 * ( D + toff ) );    // Moving Back to the Initial
+    mjt1  = new MinimumJerkTrajectory( 3,                              p0i,      p0i+delx, D, ti                );              // Forward
+    mjt2  = new MinimumJerkTrajectory( 3, Eigen::Vector3d( 0.0, 0.0, 0.0 ),     -0.7*delx, D, ti + 1 * ( D + toff ) - 0.3 );    // Backward
+    mjt3  = new MinimumJerkTrajectory( 3, Eigen::Vector3d( 0.0, 0.0, 0.0 ),      0.7*delx, D, ti + 2 * ( D + toff ) );          // Forward
+    mjt4  = new MinimumJerkTrajectory( 3, Eigen::Vector3d( 0.0, 0.0, 0.0 ),     -1.0*delx, D, ti + 3 * ( D + toff ) - 0.3 );    // Backward
 
-    t_freq = ti + 8 * ( D + toff );
+    t_freq = ti + 4 * ( D + toff ) - 0.6 + ti;
 
     // The taus (or torques) for the command
     tau_ctrl   = Eigen::VectorXd::Zero( myLBR->nq );    // The torque from the controller design,
@@ -165,8 +173,9 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     Kp = 800 * Eigen::MatrixXd::Identity( 3, 3 );
     Bp =  80 * Eigen::MatrixXd::Identity( 3, 3 );
 
-    Kq = 4.0 * Eigen::MatrixXd::Identity( myLBR->nq, myLBR->nq );
-    Bq = 1.0 * Eigen::MatrixXd::Identity( myLBR->nq, myLBR->nq );
+    Kq = 6.0 * Eigen::MatrixXd::Identity( myLBR->nq, myLBR->nq );
+    Bq = 1.5 * Eigen::MatrixXd::Identity( myLBR->nq, myLBR->nq );
+
 
     // Initial print
     printf( "Exp[licit](c)-cpp-FRI, https://explicit-robotics.github.io \n\n" );
@@ -178,10 +187,13 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     Kq_gain = 0;
 
     // Open a file
-    f.open( "singularity_test1.txt" );
+    f.open( "singularity_test3.txt" );
     fmt = Eigen::IOFormat(5, 0, ", ", "\n", "[", "]");
 
+    f << "q virtual first values: "  << q0_init.transpose(  ).format( fmt ) << std::endl;
+    f << "q virtual second values: " << q0_init2.transpose( ).format( fmt ) << std::endl;
 
+    int type = 0;
 }
 
 
@@ -203,23 +215,23 @@ MyLBRClient::~MyLBRClient()
 void iir(double NewSample[7])
 {
     double ACoef[ NCoef+1 ] =
-        {
-            0.05921059165970496400,
-            0.05921059165970496400
-        };
+    {
+        0.05921059165970496400,
+        0.05921059165970496400
+    };
 
     double BCoef[ NCoef+1 ] =
-        {
-            1.00000000000000000000,
-            -0.88161859236318907000
-        };
+    {
+        1.00000000000000000000,
+        -0.88161859236318907000
+    };
 
     // Shift the old samples
     for ( int i=0; i<7; i++ )
     {
         for( int n=NCoef; n>0; n-- )
         {
-            filterInput[ i ][ n ] =  filterInput[ i ][ n-1 ];
+             filterInput[ i ][ n ] =  filterInput[ i ][ n-1 ];
             filterOutput[ i ][ n ] = filterOutput[ i ][ n-1 ];
         }
     }
@@ -227,7 +239,7 @@ void iir(double NewSample[7])
     // Calculate the new output
     for ( int i=0; i<7; i++ )
     {
-        filterInput[ i ][ 0 ] = NewSample[ i ];
+         filterInput[ i ][ 0 ] = NewSample[ i ];
         filterOutput[ i ][ 0 ] = ACoef[ 0 ] * filterInput[ i ][ 0 ];
     }
 
@@ -248,27 +260,27 @@ void MyLBRClient::onStateChange( ESessionState oldState, ESessionState newState 
     // react on state change events
     switch (newState)
     {
-    case MONITORING_WAIT:
-    {
-        break;
-    }
-    case MONITORING_READY:
-    {
-        ts = robotState( ).getSampleTime( );
-        break;
-    }
-    case COMMANDING_WAIT:
-    {
-        break;
-    }
-    case COMMANDING_ACTIVE:
-    {
-        break;
-    }
-    default:
-    {
-        break;
-    }
+        case MONITORING_WAIT:
+        {
+            break;
+        }
+        case MONITORING_READY:
+        {
+            ts = robotState( ).getSampleTime( );
+            break;
+        }
+        case COMMANDING_WAIT:
+        {
+            break;
+        }
+        case COMMANDING_ACTIVE:
+        {
+            break;
+        }
+        default:
+        {
+            break;
+        }
     }
 }
 
@@ -372,54 +384,99 @@ void MyLBRClient::command()
     dp03 = mjt3->getVelocity( std::fmod( t, t_freq ) );
     p04  = mjt4->getPosition( std::fmod( t, t_freq ) );
     dp04 = mjt4->getVelocity( std::fmod( t, t_freq ) );
-    p05  = mjt5->getPosition( std::fmod( t, t_freq ) );
-    dp05 = mjt5->getVelocity( std::fmod( t, t_freq ) );
-    p06  = mjt6->getPosition( std::fmod( t, t_freq ) );
-    dp06 = mjt6->getVelocity( std::fmod( t, t_freq ) );
-    p07  = mjt7->getPosition( std::fmod( t, t_freq ) );
-    dp07 = mjt7->getVelocity( std::fmod( t, t_freq ) );
-    p08  = mjt8->getPosition( std::fmod( t, t_freq ) );
-    dp08 = mjt8->getVelocity( std::fmod( t, t_freq ) );
 
-    p0  =  p01 +  p02 +  p03 +  p04 +  p05 +  p06 +  p07 +  p08;
-    dp0 = dp01 + dp02 + dp03 + dp04 + dp05 + dp06 + dp07 + dp08;
+    p0  =  p01 +  p02 +  p03 +  p04;
+    dp0 = dp01 + dp02 + dp03 + dp04;
 
     // Calculate the tau
     // For Maintaining the Robot Posture
     //    tau_imp1 = Jp.transpose( ) * ( Kp * ( p0i - p_curr ) + Bp * ( - dp_curr ) );
 
-    if( std::fmod( t, t_freq )  >= ( ti + 7 * ( D + toff ) ) && std::fmod( t, t_freq )  <= ( ti + 7 * ( D + toff ) + 0.5*D ) )
+    if( std::fmod( t, t_freq ) >= ( ti + 1 * ( D + toff ) ) && std::fmod( t, t_freq ) <= ( ti + 1 * ( D + toff ) + 0.5*D ) )
     {
         if( Kq_gain <= 1 )
         {
-            Kq_gain += 0.001;
+            Kq_gain += 0.002;
         }
         else
         {
             Kq_gain = 1;
         }
+        q0_curr = q0_init2;
+        Bq( 3,3 ) = 10.0;
+        type = 2;
     }
-
-    if( std::fmod( t, t_freq )  >= ( ti + 7 * ( D + toff ) + 0.5*D ) && std::fmod( t, t_freq ) <= ( ti + 8 * ( D + toff ) ) )
+    else if( std::fmod( t, t_freq ) >= ( ti + 1 * ( D + toff ) + 0.5*D ) && std::fmod( t, t_freq ) <= ( ti + 1 * ( D + toff ) + D ) )
     {
         if( Kq_gain >= 0 )
         {
-            Kq_gain -= 0.001;
+            Kq_gain -= 0.002;
         }
         else
         {
             Kq_gain = 0;
         }
+        q0_curr = q0_init2;
+        Bq( 3,3 ) = 10.0;
+        type = 2;
+    }
+    else if( std::fmod( t, t_freq ) >= ( ti + 3 * ( D + toff ) ) && std::fmod( t, t_freq ) <= ( ti + 3 * ( D + toff ) + 0.5*D ) )
+    {
+
+        if( Kq_gain <= 1 )
+        {
+            Kq_gain += 0.002;
+        }
+        else
+        {
+            Kq_gain = 1;
+        }
+        q0_curr = q0_init;
+        Bq( 3,3 ) = 10.0;
+        type = 1;
+    }
+    else if( std::fmod( t, t_freq ) >= ( ti + 3 * ( D + toff ) + 0.5*D ) && std::fmod( t, t_freq ) <= ( ti + 3 * ( D + toff ) + D ) )
+    {
+        if( Kq_gain >= 0 )
+        {
+            Kq_gain -= 0.002;
+        }
+        else
+        {
+            Kq_gain = 0;
+        }
+        q0_curr = q0_init;
+        Bq( 3,3 ) = 10.0;
+        type = 1;
     }
 
+
     tau_imp1 = Jp.transpose( ) * ( Kp * ( p0 - p_curr ) + Bp * ( dp0 - dp_curr ) );
-    tau_imp2 = Kq_gain * Kq * ( q0_init - q ) + Bq * ( -dq );
+    tau_imp2 = Kq_gain * Kq * ( q0_curr - q ) + Bq * ( -dq );
     tau_imp3 = Jr.transpose( ) * ( 50 * R_curr * w_axis * theta - 5 * Jr * dq );
 
     // Superposition of Mechanical Impedances
     tau_ctrl = tau_imp1 + tau_imp2 + tau_imp3;
 
     // Saving not every time but every
+
+    // If the counter reaches the threshold, print to console
+    if ( n_step == 5 )
+    {
+        f << "Time: " << std::fixed << std::setw( 5 ) << t;
+        f << "  q values: " << q.transpose( ).format( fmt );
+        f << " p0 values: " << p0.transpose( ).format( fmt );
+        f << " Type: " << type;
+        f << " K gains"      << Kq_gain << std::endl;
+        end = std::chrono::steady_clock::now( );
+
+        std::cout << "Elapsed time for The Torque Calculation "
+                  << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
+                  << " us" << std::endl;
+        n_step = 0;
+    }
+
+
 
     // ************************************************************ //
     // ********************* CONTROLLER ENDS ********************* //
@@ -430,7 +487,7 @@ void MyLBRClient::command()
 
     for ( int i=0; i<7; i++ )
     {
-        q_command[ i ] = filterOutput[ i ][ 0 ];
+          q_command[ i ] = filterOutput[ i ][ 0 ];
         tau_command[ i ] = tau_total[ i ];
     }
 
