@@ -1,3 +1,9 @@
 [submodule "Explicit-FRI"]
 	path = Explicit-FRI
 	url = https://github.com/explicit-robotics/Explicit-FRI.git
+[submodule "MATLABApplications/Explicit-MATLAB"]
+	path = MATLABApplications/Explicit-MATLAB
+	url = https://github.com/explicit-robotics/Explicit-MATLAB.git
+[submodule "MATLABApplications/GeometryLibrary"]
+	path = MATLABApplications/GeometryLibrary
+	url = https://github.com/mosesnah-shared/GeometryLibrary.git
