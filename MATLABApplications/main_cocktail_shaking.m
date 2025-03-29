@@ -5,14 +5,13 @@ clear; close all; clc;
 % Under "Explicit-MATLAB" directory, run setup.m file
 cd(fileparts(matlab.desktop.editor.getActiveFilename));
 
+addpath( 'Explicit-MATLAB' );    
+run('Explicit-MATLAB/setup.m');  % Replace 'myscript.m' with your actual script name
+
 % Configure default figure properties
 fig_config( 'fontSize', 20, 'markerSize', 10 )
 
-% (--) Initialization
-clear; close all; clc;
-
-% Figure configuration and colors
-fig_config( 'fontSize', 20, 'markerSize', 10 )
+addpath( 'utils', 'DMPmodules', 'GeometryLibrary\MATLAB\' );    
 
 %% (1A) Read data
 file_dir = '../KUKARobotApplications/example2_cocktail_shake/data/forMATLAB/shake1.txt';
@@ -28,7 +27,7 @@ t_arr   = data{1}';                % [N x 1]
 t_raw   = t_arr - t_arr( 1 );
 q_raw   = cell2mat(data(2:8))';   % [7 x N]
 
-%% (1B)
+%% (1A1)
 % Call the robot for Forward Kinematics
 robot = iiwa14( 'high' );
 robot.init( );
@@ -51,7 +50,7 @@ plot( a, t_raw, w_raw );
 set( a, 'xlim', [ 0, max( t_raw ) ], 'fontsize', 25 );
 xlabel( a, 'Time (s)', 'fontsize', 25 )
 
-%% --- (1B) Calculate e_demo, de_demo, dde_demo array
+%% (1B) Calculate e_demo, de_demo, dde_demo array
 
 % Trim the data to be repeatable 
 T_trim1 = 3.2;
@@ -157,7 +156,7 @@ plot( t_demo, dde_demo )
 subplot( 3, 2, 6 ); hold on;
 plot( t_demo, dde_demo_filt )
 
-%% --- (1C) Conduct Imitation Learning and Rollout
+%% (1C) Conduct Imitation Learning and Rollout
 
 as = 1.0;
 az = 200;
@@ -212,7 +211,50 @@ end
 % Reshaping A into a 3x(3*N) array
 R_arr_save = reshape(R_arr, 3, []);
 
-%% --- (1D) Conduct Imitation Learning and Rollout
+%% (1D) Draw on SO(3)
+Nt    = length( t_arr );
+
+% The exponential coordinates 
+e_arr_cmd = e_arr;
+
+% Define the radius
+r = pi;
+
+% Generate the unit sphere data
+[x, y, z] = sphere(50);  % 50 controls the resolution
+
+% Scale the unit sphere to radius pi
+x = r * x;
+y = r * y;
+z = r * z;
+
+% Plot the sphere
+f = figure( ); a = axes( 'parent', f );
+hold on
+s = surf(a, x, y, z);
+axis equal;
+
+% Make the surface transparent and remove colormap
+set(s, 'FaceAlpha', 0.2, 'EdgeAlpha', 0.1, 'FaceColor', [0.5 0.5 0.5]);  % light gray
+
+scl_arr = [ 0.3, 0.5, 0.7, 1.0, 1.2, 1.5, 2.0, 2.5 ];
+Ns = length( scl_arr );
+
+for i = 1 : Ns
+    scl = scl_arr( i );
+    scatter3( a, scl * e_arr_cmd( 1, 1 ), scl * e_arr_cmd( 2, 1 ), scl * e_arr_cmd( 3, 1 ), 100,'filled', 'markerfacecolor', 'w', 'markeredgecolor', 'k', 'linewidth', 3)
+    plot3( a, scl * e_arr_cmd( 1, : ), scl * e_arr_cmd( 2, : ), scl * e_arr_cmd( 3, : ), 'linewidth', 2, 'color', 'k' )
+end
+
+scatter3( a, 0, 0, 0, 100,'filled', 'markerfacecolor', 'w', 'markeredgecolor', 'k', 'linewidth', 3)
+scatter3( a, e_arr_cmd( 1, 1 ), e_arr_cmd( 2, 1 ), e_arr_cmd( 3, 1 ), 100,'filled', 'markerfacecolor', [0 0.4470 0.7410], 'markeredgecolor', 'k', 'linewidth', 3)
+plot3( a, e_arr_cmd( 1, : ), e_arr_cmd( 2, : ), e_arr_cmd( 3, : ), 'linewidth', 4, 'color', [0 0.4470 0.7410]	 )
+
+set( a, 'visible', 'off', 'view', [ 46.0050, 2.4334] )
+exportgraphics( f, '../images/cocktail_shaking/shakemodes.pdf', 'ContentType', 'vector');
+
+
+%% (1E) Conduct Imitation Learning and Rollout
 
 anim = Animation( 'Dimension', 3, 'xLim', [-0.2,1.2], ...
                   'yLim', [-0.7,0.7], 'zLim', [0,1.4], 'isSaveVideo', false, 'VideoSpeed', 1.0 );
@@ -321,3 +363,6 @@ for i = 1:Nt
 end
 
 anim.close( )
+
+
+%% (2B) Draw Eight and Circle n
