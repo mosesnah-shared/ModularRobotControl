@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 
 # Check complete!
 # [Moses C. Nah] March 28th
-project(SingularityWholeWorkspace)
+project(TrackingPerformance)
 
 ## Define the base directory for external libraries
 set(LIBRARIES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../Explicit-FRI/Libraries")

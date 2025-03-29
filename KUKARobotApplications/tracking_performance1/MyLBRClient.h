@@ -116,7 +116,8 @@ private:
     // Time parameters for control loop
     double ts;
     double t;
-    double t_first;
+    double amp;
+    double t_pressed;
 
     // The number of time steps for the simulation
     int n_step;
@@ -125,9 +126,11 @@ private:
     Eigen::Vector3d  p_curr;
     Eigen::Vector3d dp_curr;
     MinimumJerkTrajectory *mjt_w;
+    MinimumJerkTrajectory *mjt_p;
 
     // The virtual task-space trajectory, position.
     Eigen::Vector3d p0;
+    Eigen::Vector3d p0_osc;
     Eigen::Vector3d dp0;
     Eigen::Vector3d w01;
 
@@ -152,8 +155,10 @@ private:
     Eigen::MatrixXd Jr;     // The rotation Jacobian
     Eigen::Matrix3d Kp;     // Task-space stiffness, position
     Eigen::Matrix3d Bp;     // Task-space damping, position
-    Eigen::MatrixXd Bq;     // Joint-space damping.
-    Eigen::MatrixXd Kq;     // Joint-space damping.
+    Eigen::Matrix3d Kr;     // Task-space stiffness, orientation
+    Eigen::Matrix3d Br;     // Task-space damping, orientation
+    Eigen::MatrixXd Kq;     // Joint-space stiffness
+    Eigen::MatrixXd Bq;     // Joint-space damping
 
     Eigen::Matrix3d R_curr;  // SO(3) Matrix for the current orientation
     Eigen::Matrix3d R_des;   // SO(3) Matrix for the desired orientation
@@ -163,19 +168,6 @@ private:
     Eigen::MatrixXd R_data;
     Eigen::Vector3d w_axis;
     Eigen::Vector3d wdel;
-
-    // The control of different point of the robot
-    Eigen::Vector3d  offset;
-    Eigen::Vector3d  p_off;
-    Eigen::Matrix4d  H_off;
-    Eigen::MatrixXd Jp_off;
-    Eigen::MatrixXd  J_off;
-
-
-    int N_data;
-    int N_curr;
-    int sgn;
-    double toff;
 
     bool is_pressed;
 

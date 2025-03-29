@@ -116,7 +116,7 @@ private:
     // Time parameters for control loop
     double ts;
     double t;
-    double t_first;
+    double t_pressed;
 
     // The number of time steps for the simulation
     int n_step;
@@ -126,10 +126,22 @@ private:
     Eigen::Vector3d dp_curr;
     MinimumJerkTrajectory *mjt_w;
 
+    MinimumJerkTrajectory *mjt_w1;
+    MinimumJerkTrajectory *mjt_w2;
+
     // The virtual task-space trajectory, position.
     Eigen::Vector3d p0;
     Eigen::Vector3d dp0;
     Eigen::Vector3d w01;
+
+    Eigen::Vector3d w_move1;
+    Eigen::Vector3d w_move2;
+
+    double D1;
+    double D2;
+
+    double toff1;
+    double toff2;
 
     // Current position and velocity as Eigen vector
     Eigen::VectorXd q;
