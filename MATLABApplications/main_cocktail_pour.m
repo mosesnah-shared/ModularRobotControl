@@ -5,16 +5,21 @@ clear; close all; clc;
 % Under "Explicit-MATLAB" directory, run setup.m file
 cd(fileparts(matlab.desktop.editor.getActiveFilename));
 
+% Add Explicit-MATLAB for visualization
+% Activate setup Explicit-MATLAB
+addpath( 'Explicit-MATLAB' );    
+run('Explicit-MATLAB/setup.m');  % Replace 'myscript.m' with your actual script name
+
 % Also, make sure you attach GeometryLibrary too
+addpath( 'DMPmodules', 'utils', 'GeometryLibrary/MATLAB' )
 
 % Configure default figure properties
 fig_config( 'fontSize', 20, 'markerSize', 10 )
 
-addpath( 'DMPmodules\' )
 
 %% (1A) Read the txt file 
 
-file_dir = '../KUKARobotApplications/example2_cocktail_pour/data/pour1.txt';
+file_dir = '../KUKARobotApplications/iiwa14_cocktail_pour/data/pour1.txt';
 fid = fopen( file_dir, 'r');
 
 formatSpec = 'Time: %f  q values: [ %f, %f, %f, %f, %f, %f, %f] ';
@@ -150,7 +155,7 @@ a5 = subplot( 3, 2, 6 ); hold on;
 plot( t_demo, dde_demo_filt )
 set( a5, 'xlim', [ 0, Tmax ], 'xticklabel', {}, 'yticklabel', {} )
 
-exportgraphics( f, '../images/imit_learning_pour1.pdf', 'ContentType', 'vector');
+exportgraphics( f, '../images/cocktail_pouring/imit_learning_pour1.pdf', 'ContentType', 'vector');
 
 %% (1C) Conduct Imitation Learning and Rollout
 
@@ -215,6 +220,10 @@ end
 
 % Reshaping A into a 3x(3*N) array
 R_arr_save = reshape( R_arr, 3, []);
+
+% Saving the data as csv file
+csv_filename = '../KUKARobotApplications/iiwa14_cocktail_pour/dataread/pour_1p0scl.csv';
+writematrix( R_arr_save, csv_filename);
 
 %% (1C2) Plot the R3 movement, on the SO(3) Manifold
 Nt    = length( t_arr );

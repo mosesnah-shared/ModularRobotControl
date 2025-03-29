@@ -80,6 +80,7 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     q_init[5] = -37.73 * M_PI/180;
     q_init[6] =  0.000 * M_PI/180;
 
+
     q_init2[0] =   3.59 * M_PI/180;
     q_init2[1] =  96.19 * M_PI/180;
     q_init2[2] = -15.99 * M_PI/180;
@@ -89,7 +90,7 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     q_init2[6] =  13.68 * M_PI/180;
 
     // Use Explicit-cpp to create your robot
-    myLBR = new iiwa14( 1, "Dwight" );
+    myLBR = new iiwa14( 1, "Trey" );
 
     // Initialization must be called!!
     myLBR->init( );
