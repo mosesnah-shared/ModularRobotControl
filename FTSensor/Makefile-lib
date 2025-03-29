@@ -1,0 +1,12 @@
+# This makefile is to create the shared library, .so file
+# Simply run "make -f Makefile-lib" in the terminal
+
+
+.PHONY: all 
+
+all: 
+	mkdir -p build
+	mkdir -p lib
+	g++ -Iinclude -IEigen -MMD -MP -Wall -fPIC -g -O3 -std=c++17 -c ./src/AtiForceTorqueSensor.cpp -o ./build/AtiForceTorqueSensor.o 
+	g++ -Iinclude -IEigen -MMD -MP -Wall -fPIC -g -O3 -std=c++17 ./build/AtiForceTorqueSensor.o  -shared -o ./lib/libFTSensor.so
+
