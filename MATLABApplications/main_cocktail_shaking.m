@@ -11,10 +11,10 @@ run('Explicit-MATLAB/setup.m');  % Replace 'myscript.m' with your actual script 
 % Configure default figure properties
 fig_config( 'fontSize', 20, 'markerSize', 10 )
 
-addpath( 'utils', 'DMPmodules', 'GeometryLibrary\MATLAB\' );    
+addpath( 'utils', 'DMPmodules', 'GeometryLibrary/MATLAB' );    
 
 %% (1A) Read data
-file_dir = '../KUKARobotApplications/example2_cocktail_shake/data/forMATLAB/shake1.txt';
+file_dir = '../KUKARobotApplications/iiwa14_cocktail_shake/data/shake1.txt';
 fid = fopen( file_dir, 'r');
 
 formatSpec = 'Time: %f  q values: [ %f, %f, %f, %f, %f, %f, %f] ';
@@ -192,7 +192,7 @@ t_arr = 0:dt:(1.0*T*2);
 Nt    = length( t_arr );
 
 % The scaling factor 
-scl = 1.0;
+scl = 2.0;
 input_arr = fs.calc_forcing_term( t_arr( 1:end-1 ), weight, t0i, eye( 3 ) );
 
 [ e_arr, ~, ~, ] = trans_sys.rollout( zeros( 3, 1 ), zeros( 3, 1 ), scl*mean( e_demo, 2 ), scl*input_arr, t0i, t_arr ); 
@@ -210,6 +210,12 @@ end
 
 % Reshaping A into a 3x(3*N) array
 R_arr_save = reshape(R_arr, 3, []);
+
+% Saving the data as csv file
+scl_str = strrep(num2str(scl, '%.1f'), '.', 'p');
+csv_filename = ['../KUKARobotApplications/iiwa14_cocktail_shake/dataread/shake_' scl_str 'scl.csv'];
+writematrix( R_arr_save, csv_filename);
+
 
 %% (1D) Draw on SO(3)
 Nt    = length( t_arr );

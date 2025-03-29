@@ -155,7 +155,7 @@ a5 = subplot( 3, 2, 6 ); hold on;
 plot( t_demo, dde_demo_filt )
 set( a5, 'xlim', [ 0, Tmax ], 'xticklabel', {}, 'yticklabel', {} )
 
-exportgraphics( f, '../images/cocktail_pouring/imit_learning_pour1.pdf', 'ContentType', 'vector');
+% exportgraphics( f, '../images/cocktail_pouring/imit_learning_pour1.pdf', 'ContentType', 'vector');
 
 %% (1C) Conduct Imitation Learning and Rollout
 
@@ -194,7 +194,7 @@ t_arr = 0:dt:T;
 Nt    = length( t_arr );
 
 % The scaling factor 
-scl = 1.0;
+scl = 2.0;
 
 input_arr = fs.calc_forcing_term( t_arr( 1:end-1 ), weight, t0i, eye( 3 ) );
 [ e_arr, ~, ~, ] = trans_sys.rollout( scl*e_demo( :, 1 ), zeros( 3, 1 ), zeros( 3, 1 ), scl*input_arr, t0i, t_arr ); 
@@ -222,7 +222,8 @@ end
 R_arr_save = reshape( R_arr, 3, []);
 
 % Saving the data as csv file
-csv_filename = '../KUKARobotApplications/iiwa14_cocktail_pour/dataread/pour_1p0scl.csv';
+scl_str = strrep(num2str(scl, '%.1f'), '.', 'p');
+csv_filename = ['../KUKARobotApplications/iiwa14_cocktail_pour/dataread/pour_' scl_str 'scl.csv'];
 writematrix( R_arr_save, csv_filename);
 
 %% (1C2) Plot the R3 movement, on the SO(3) Manifold

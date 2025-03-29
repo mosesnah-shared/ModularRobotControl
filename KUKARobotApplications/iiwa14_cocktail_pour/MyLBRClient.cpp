@@ -214,7 +214,7 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     q_init[6] =  0.000 * M_PI/180;
 
     // Use Explicit-cpp to create your robot
-    myLBR = new iiwa14( 1, "Trey", Eigen::Vector3d( 0.0, 0.0, 0.15 ) );
+    myLBR = new iiwa14( 1, "Trey", Eigen::Vector3d( 0.0, 0.0, 0.0 ) );
 
     // Initialization must be called!!
     myLBR->init( );
@@ -245,8 +245,11 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     }
 
     // Once Initialized, get the initial end-effector position
+    // The end-effector is with offset, define
+    offset = Eigen::Vector3d( 0.0, 0.0, 0.0 );
+
     // Forward Kinematics and the current position
-    H = myLBR->getForwardKinematics( q );
+    H = myLBR->getForwardKinematics( q, 7, offset );
     p_init  = H.block< 3, 1 >( 0, 3 );
     R_init  = H.block< 3, 3 >( 0, 0 );
 
@@ -291,14 +294,16 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     printf( "Robot '" );
     printf( "%s", myLBR->Name );
     printf( "' initialised. Ready to rumble! \n" );
-    printf( "The current script runs Task-space Impedance Control, Orientation \n" );
+    printf( "The current script runs Task-space Impedance Control, Orientation, Discrete \n" );
 
     // Read the Data
-    R_data = readCSV( "../dataread/shake_2p0scl.csv" );
+    R_data = readCSV( "../dataread/pour_2p0scl.csv" );
 
     // Number of data points, and its current number
     N_data = R_data.cols( )/3;
     N_curr = 0;
+    sgn = +1;
+    toff = 2.0;
 
     is_pressed = false;
 }
@@ -449,13 +454,13 @@ void MyLBRClient::command()
     // ************************************************************ //
 
     start = std::chrono::steady_clock::now( );
-    H = myLBR->getForwardKinematics( q );
+    H = myLBR->getForwardKinematics( q, 7, offset );
     p_curr = H.block< 3, 1 >( 0, 3 );
     R_curr = H.block< 3, 3 >( 0, 0 );
 
     // Get the current end-effector velocity
     // Hybrid Jacobian Matrix (6x7) and its linear velocity part (3x7)
-    J  = myLBR->getHybridJacobian( q );
+    J  = myLBR->getHybridJacobian( q, offset );
 
     Jp = J.block( 0, 0, 3, myLBR->nq );
     Jr = J.block( 3, 0, 3, myLBR->nq );
@@ -469,17 +474,34 @@ void MyLBRClient::command()
     // Start the update
     if( is_pressed )
     {
-        if( t_first >= 2.0 )
+        // Some time offset for each movement
+        if( t_first >= toff )
         {
-            if ( n_step % 1 == 0)
+            // Update
+            if ( n_step % 1 == 0 )
             {
                 // The update of N_curr
-                N_curr += 6;
+                N_curr += sgn * 3;
             }
 
-            if( N_curr >= N_data-1 )
+            if( N_curr > N_data-1 )
+            {
+                N_curr = N_data-1;
+                sgn = -1;
+
+                // Initialize t_first
+                t_first = 0.0;
+                toff = 0.3;
+            }
+
+            if( N_curr < 0 )
             {
                 N_curr = 0;
+                sgn = +1;
+
+                // Initialize t_first
+                t_first = 0.0;
+                toff = 1.0;
             }
 
         }

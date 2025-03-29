@@ -45,6 +45,7 @@ or otherwise, without the prior written consent of KUKA Roboter GmbH.
 #include "exp_robots.h"
 #include "exp_trajs.h"
 
+
 using namespace KUKA::FRI;
 /**
  * \brief Template client implementation.
@@ -123,10 +124,12 @@ private:
     // Choose the body you want to control and the position on this body
     Eigen::Vector3d  p_curr;
     Eigen::Vector3d dp_curr;
+    MinimumJerkTrajectory *mjt_w;
 
     // The virtual task-space trajectory, position.
     Eigen::Vector3d p0;
     Eigen::Vector3d dp0;
+    Eigen::Vector3d w01;
 
     // Current position and velocity as Eigen vector
     Eigen::VectorXd q;
@@ -159,15 +162,22 @@ private:
 
     Eigen::MatrixXd R_data;
     Eigen::Vector3d w_axis;
-    Eigen::Vector3d w01;
+    Eigen::Vector3d wdel;
 
-    MinimumJerkTrajectory *mjt_w;
+    // The control of different point of the robot
+    Eigen::Vector3d  offset;
+    Eigen::Vector3d  p_off;
+    Eigen::Matrix4d  H_off;
+    Eigen::MatrixXd Jp_off;
+    Eigen::MatrixXd  J_off;
+
 
     int N_data;
     int N_curr;
+    int sgn;
+    double toff;
 
     bool is_pressed;
-
 
     std::chrono::steady_clock::time_point start;
     std::chrono::steady_clock::time_point end;

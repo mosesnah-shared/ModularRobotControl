@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(CocktailPouring)
+project(CocktailMaking)
 
 ## Define the base directory for external libraries
 set(LIBRARIES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../Explicit-FRI/Libraries")
