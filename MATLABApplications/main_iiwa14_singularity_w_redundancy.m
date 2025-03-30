@@ -36,6 +36,7 @@ fclose(fid);
 
 % Extract and reshape
 t_arr   = data{1};                % [N x 1]
+t_arr   = t_arr - t_arr( 1 );
 q_arr   = cell2mat(data(2:8))';   % [7 x N]
 p0_arr  = cell2mat(data(9:11))';  % [3 x N]
 Nt = length( t_arr );
@@ -71,6 +72,18 @@ set( a, 'visible', 'off' )
 exportgraphics( f, '../images/iiwa14_singularity_w_redundancy/no_Kq.pdf', 'ContentType', 'vector');
 rmse = sqrt( mean((p_raw - p0_arr).^2, 2));
 
+%% (1C) Plot the joint trajectories over time
+
+f = figure( ); a = axes( 'parent', f );
+hold on; 
+idx = 200;
+plot( t_arr( idx:end ), q_arr( :, idx:end ), 'linewidth', 8)
+set( a, 'xlim', [t_arr( idx ), max( t_arr) ], 'xticklabel', {}, 'yticklabel', {} )
+xlabel( a, '$t$ (s)', 'fontsize', 40 )
+ylabel( a, '$\mathbf{q}(t)$', 'fontsize', 50 )
+
+exportgraphics( f, '../images/iiwa14_singularity_w_redundancy/q_arr_no_Kq.pdf', 'ContentType', 'vector');
+
 
 %% (2A) with joint stiffness
 file_dir = '../data/KUKAresult/iiwa14_singularity_repeatability_Kq6_Tp8.txt';
@@ -88,7 +101,7 @@ q_arr   = cell2mat(data(2:8))';   % [7 x N]
 p0_arr  = cell2mat(data(9:11))';  % [3 x N]
 Nt = length( t_arr );
 
-%% (1B) Calculate the Forward Kinematics Map, plot the results
+%% (2B) Calculate the Forward Kinematics Map, plot the results
 
 % Call the robot for Forward Kinematics
 robot = iiwa14( 'high' );
@@ -118,3 +131,14 @@ set( a, 'visible', 'off' )
 
 exportgraphics( f, '../images/iiwa14_singularity_w_redundancy/with_Kq.pdf', 'ContentType', 'vector');
 rmse = sqrt( mean((p_raw - p0_arr).^2, 2));
+
+%% (2C) Plot the joint trajectories over time
+
+f = figure( ); a = axes( 'parent', f );
+hold on; 
+idx = 200;
+plot( t_arr( idx:end ), q_arr( :, idx:end ), 'linewidth', 8)
+set( a, 'xlim', [t_arr( idx ), max( t_arr) ], 'xticklabel', {}, 'yticklabel', {} )
+xlabel( a, '$t$ (s)', 'fontsize', 40 )
+ylabel( a, '$\mathbf{q}(t)$', 'fontsize', 50 )
+exportgraphics( f, '../images/iiwa14_singularity_w_redundancy/q_arr_with_Kq.pdf', 'ContentType', 'vector');
