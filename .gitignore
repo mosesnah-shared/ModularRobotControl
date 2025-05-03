@@ -4,3 +4,4 @@ MATLABApplications/MATLABdata/iiwa14_sing_data_N30.mat
 /MuJoCoExamples/utils/__pycache__
 *.asv
 data/MATLAB/iiwa14_sing_data_N30.mat
+*.xmp
