@@ -236,8 +236,8 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     Jr = Eigen::MatrixXd::Zero( 3, myLBR->nq );
 
     // The stiffness/damping matrices
-    Kp = 800 * Eigen::MatrixXd::Identity( 3, 3 );
-    Bp =  80 * Eigen::MatrixXd::Identity( 3, 3 );
+    Kp = 1600 * Eigen::MatrixXd::Identity( 3, 3 );
+    Bp =  120 * Eigen::MatrixXd::Identity( 3, 3 );
 
     Kr =  70 * Eigen::MatrixXd::Identity( 3, 3 );
     Br =   5 * Eigen::MatrixXd::Identity( 3, 3 );
@@ -246,7 +246,7 @@ MyLBRClient::MyLBRClient(double freqHz, double amplitude)
     Bq = 4.5 * Eigen::MatrixXd::Identity( myLBR->nq, myLBR->nq );
 
     // Open a file
-    f.open( "../data/repeat_Kq6.txt" );
+    f.open( "../data/iiwa14_singularity_repeatability_Kp1600_Kq6_Tp4.txt" );
     fmt = Eigen::IOFormat(5, 0, ", ", "\n", "[", "]");
 
 
@@ -449,8 +449,8 @@ void MyLBRClient::command()
     w_axis = so3_to_R3( SO3_to_so3( R_del ) );
 
     tau_imp1 = Jp.transpose( ) * ( Kp * ( p0 - p_curr ) + Bp * ( - dp_curr ) );
-    //    tau_imp2 = Kq * ( q0_init - q ) + Bq * ( -dq );
-    tau_imp2 = Bq * ( -dq );
+    tau_imp2 = Kq * ( q0_init - q ) + Bq * ( -dq );
+    // tau_imp2 = Bq * ( -dq );
     tau_imp3 = Jr.transpose( ) * ( Kr * R_curr * w_axis - Br * Jr * dq );
 
     // Superposition of Mechanical Impedances
@@ -496,7 +496,7 @@ void MyLBRClient::command()
     {
         f << "Time: " << std::fixed << std::setw( 5 ) << t;
         f << " Joint Angle " << q.transpose( ).format( fmt ) ;
-        f << "p0 Command" << p0.transpose( ).format( fmt ) ;
+        f << "p0 Command " << p0.transpose( ).format( fmt ) ;
         f << std::endl;
 
         end = std::chrono::steady_clock::now( );
