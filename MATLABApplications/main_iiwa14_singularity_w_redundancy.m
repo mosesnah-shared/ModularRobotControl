@@ -25,11 +25,11 @@ data_dir = '';
 % Values Kp 800 Bp 80 Kr 70 Br 5 Kq 6 Bq 4.5 Tp 8
 
 %% (1A) No joint stiffness
-file_dir = '../data/KUKAresult/iiwa14_singularity_repeatability_Kq0_Tp8.txt';
+file_dir = '../data/KUKAresult/iiwa14_singularity_repeatability_Kp1600_Kq0_Tp4.txt';
 fid = fopen( file_dir, 'r');
 
 formatSpec = ['Time: %f  Joint Angle [ %f, %f, %f, %f, %f, %f, %f] ', ...
-              'p0 Command[%f, %f, %f]'];
+              'p0 Command [%f, %f, %f]'];
 
 data = textscan(fid, formatSpec);
 fclose(fid);
@@ -60,7 +60,7 @@ for i = 1 : Nt
 end
 
 % starting index 
-idx = 200;
+idx = 400;
 idx1 = 533;
 
 f = figure( ); a = axes( 'parent', f );
@@ -86,11 +86,11 @@ exportgraphics( f, '../images/iiwa14_singularity_w_redundancy/q_arr_no_Kq.pdf', 
 
 
 %% (2A) with joint stiffness
-file_dir = '../data/KUKAresult/iiwa14_singularity_repeatability_Kq6_Tp8.txt';
+file_dir = '../data/KUKAresult/iiwa14_singularity_repeatability_Kp1600_Kq6_Tp4.txt';
 fid = fopen( file_dir, 'r');
 
 formatSpec = ['Time: %f  Joint Angle [ %f, %f, %f, %f, %f, %f, %f] ', ...
-              'p0 Command[%f, %f, %f]'];
+              'p0 Command [%f, %f, %f]'];
 
 data = textscan(fid, formatSpec);
 fclose(fid);
@@ -120,7 +120,7 @@ for i = 1 : Nt
 end
 
 % starting index 
-idx = 200;
+idx = 400;
 idx1 = 533;
 
 f = figure( ); a = axes( 'parent', f );
