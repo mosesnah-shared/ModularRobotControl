@@ -1,1 +1,1 @@
-This repository contains all the codes for simulation (python) and KUKA robot control (C++). 
+This repository contains all the codes for simulation (python) and KUKA robot control (C++). The paper has been submitted to International Journal of Robotics Research (IJRR) for review, and has been published on ArXiV: https://arxiv.org/pdf/2505.10694.
